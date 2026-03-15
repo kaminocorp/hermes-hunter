@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { Cpu, MemoryStick, Network, Database, Zap, TrendingUp } from 'lucide-react'
 
 interface Metric {
@@ -13,115 +12,126 @@ interface Metric {
 }
 
 export default function SystemMetrics() {
-  const [metrics, setMetrics] = useState<Metric[]>([
+  const [metrics] = useState<Metric[]>([
     {
       label: 'CPU Usage',
       value: '23%',
       percentage: 23,
       status: 'good',
-      icon: <Cpu className="h-4 w-4" />
+      icon: <Cpu className="h-4 w-4" strokeWidth={1.5} />
     },
     {
       label: 'Memory',
       value: '2.1GB',
       percentage: 42,
       status: 'good',
-      icon: <MemoryStick className="h-4 w-4" />
+      icon: <MemoryStick className="h-4 w-4" strokeWidth={1.5} />
     },
     {
       label: 'Network I/O',
       value: '1.2 MB/s',
       status: 'good',
-      icon: <Network className="h-4 w-4" />
+      icon: <Network className="h-4 w-4" strokeWidth={1.5} />
     },
     {
       label: 'Hunter API',
       value: 'Healthy',
       status: 'good',
-      icon: <Database className="h-4 w-4" />
+      icon: <Database className="h-4 w-4" strokeWidth={1.5} />
     },
     {
       label: 'Analysis Rate',
       value: '4.2/min',
       status: 'good',
-      icon: <TrendingUp className="h-4 w-4" />
+      icon: <TrendingUp className="h-4 w-4" strokeWidth={1.5} />
     },
     {
       label: 'Response Time',
       value: '120ms',
       status: 'good',
-      icon: <Zap className="h-4 w-4" />
+      icon: <Zap className="h-4 w-4" strokeWidth={1.5} />
     }
   ])
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good':
-        return 'text-terminal-green'
+        return 'text-[rgb(80,140,80)]'
       case 'warning':
-        return 'text-terminal-amber'
+        return 'text-[rgb(160,120,60)]'
       case 'critical':
-        return 'text-terminal-red'
+        return 'text-[rgb(180,50,50)]'
       default:
-        return 'text-gray-400'
+        return 'text-[rgb(100,100,105)]'
     }
   }
 
   const getStatusBg = (status: string) => {
     switch (status) {
       case 'good':
-        return 'bg-terminal-green/20'
+        return 'bg-[rgb(80,140,80)]/20'
       case 'warning':
-        return 'bg-terminal-amber/20'
+        return 'bg-[rgb(160,120,60)]/20'
       case 'critical':
-        return 'bg-terminal-red/20'
+        return 'bg-[rgb(180,50,50)]/20'
       default:
-        return 'bg-gray-800/20'
+        return 'bg-[rgb(40,40,45)]/20'
+    }
+  }
+
+  const getProgressColor = (status: string) => {
+    switch (status) {
+      case 'good':
+        return 'bg-[rgb(80,140,80)]'
+      case 'warning':
+        return 'bg-[rgb(160,120,60)]'
+      case 'critical':
+        return 'bg-[rgb(180,50,50)]'
+      default:
+        return 'bg-[rgb(100,100,105)]'
     }
   }
 
   return (
     <div className="px-6 py-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-300">System Metrics</h3>
-        <span className="text-xs text-gray-500">Last updated: {new Date().toLocaleTimeString()}</span>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-semibold text-[rgb(160,160,160)] tracking-widest uppercase">System Metrics</h3>
+        <span className="text-[10px] text-[rgb(80,80,80)] tracking-wider">
+          LAST UPDATE: {new Date().toLocaleTimeString('en-GB')} UTC
+        </span>
       </div>
       
-      <div className="grid grid-cols-6 gap-4 mt-3">
-        {metrics.map((metric, index) => (
-          <motion.div
+      <div className="grid grid-cols-6 gap-4">
+        {metrics.map((metric) => (
+          <div
             key={metric.label}
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${getStatusBg(metric.status)} border border-gray-700/50`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
+            className={`flex items-center space-x-3 px-3 py-3 ${getStatusBg(metric.status)} border border-[rgb(60,60,65)]`}
           >
             <div className={getStatusColor(metric.status)}>
               {metric.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400 font-medium">{metric.label}</span>
-                <span className={`text-sm font-semibold ${getStatusColor(metric.status)}`}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] text-[rgb(100,100,105)] tracking-wider uppercase">
+                  {metric.label}
+                </span>
+                <span className={`text-sm font-bold ${getStatusColor(metric.status)} tracking-wider`}>
                   {metric.value}
                 </span>
               </div>
               {metric.percentage !== undefined && (
-                <div className="w-full bg-gray-800 rounded-full h-1 mt-1">
-                  <motion.div
-                    className={`h-1 rounded-full ${
-                      metric.status === 'good' ? 'bg-terminal-green' :
-                      metric.status === 'warning' ? 'bg-terminal-amber' :
-                      'bg-terminal-red'
+                <div className="progress-container">
+                  <div
+                    className={`progress-fill ${
+                      metric.status === 'warning' ? 'warning' :
+                      metric.status === 'critical' ? 'critical' : ''
                     }`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${metric.percentage}%` }}
-                    transition={{ duration: 0.8, delay: index * 0.1 }}
+                    style={{ width: `${metric.percentage}%` }}
                   />
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

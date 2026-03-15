@@ -1,7 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { Target, Clock, CheckCircle, AlertTriangle, Play, Pause } from 'lucide-react'
 
 interface Mission {
@@ -17,132 +15,144 @@ interface Mission {
 }
 
 export default function MissionPanel() {
-  const [missions, setMissions] = useState<Mission[]>([
-    {
-      id: 'mission-001',
-      name: 'GitLab CE Analysis',
-      target: 'gitlab.com/gitlab-org/gitlab',
-      status: 'active',
-      progress: 65,
-      phase: 'Authentication Analysis',
-      vulnerabilities: 2,
-      startTime: '14:30:00',
-      estimatedCompletion: '15:45:00'
-    }
-  ])
+  const missions: Mission[] = []
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'text-terminal-green'
+        return 'text-[rgb(80,140,80)]'
       case 'completed':
-        return 'text-terminal-blue'
+        return 'text-[rgb(180,180,180)]'
       case 'paused':
-        return 'text-terminal-amber'
+        return 'text-[rgb(160,120,60)]'
       case 'failed':
-        return 'text-terminal-red'
+        return 'text-[rgb(180,50,50)]'
       default:
-        return 'text-gray-400'
+        return 'text-[rgb(100,100,105)]'
     }
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <Play className="h-3 w-3" />
+        return <Play className="h-3 w-3" strokeWidth={1.5} />
       case 'completed':
-        return <CheckCircle className="h-3 w-3" />
+        return <CheckCircle className="h-3 w-3" strokeWidth={1.5} />
       case 'paused':
-        return <Pause className="h-3 w-3" />
+        return <Pause className="h-3 w-3" strokeWidth={1.5} />
       case 'failed':
-        return <AlertTriangle className="h-3 w-3" />
+        return <AlertTriangle className="h-3 w-3" strokeWidth={1.5} />
       default:
-        return <Clock className="h-3 w-3" />
+        return <Clock className="h-3 w-3" strokeWidth={1.5} />
+    }
+  }
+
+  const getProgressColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-[rgb(80,140,80)]'
+      case 'completed':
+        return 'bg-[rgb(180,180,180)]'
+      case 'paused':
+        return 'bg-[rgb(160,120,60)]'
+      case 'failed':
+        return 'bg-[rgb(180,50,50)]'
+      default:
+        return 'bg-[rgb(100,100,105)]'
     }
   }
 
   return (
     <div className="h-full flex flex-col p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
-          <Target className="h-5 w-5 text-terminal-amber" />
+        <h3 className="text-sm font-semibold tracking-widest uppercase flex items-center space-x-2 text-[rgb(160,160,160)]">
+          <Target className="h-4 w-4" strokeWidth={1.5} />
           <span>Active Missions</span>
         </h3>
-        <span className="text-sm text-gray-400">{missions.length} running</span>
+        <span className="text-xs text-[rgb(100,100,105)] tracking-wider">{missions.length} RUNNING</span>
       </div>
 
       <div className="space-y-4">
-        {missions.map((mission) => (
-          <motion.div
-            key={mission.id}
-            className="border border-gray-700 rounded-lg p-4 bg-gray-900/30 terminal-glow"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <span className={getStatusColor(mission.status)}>
-                  {getStatusIcon(mission.status)}
-                </span>
-                <h4 className="font-medium">{mission.name}</h4>
-              </div>
-              <span className="text-xs text-gray-400">{mission.id}</span>
+        {missions.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-[rgb(80,80,80)] text-sm tracking-wider mb-2">NO ACTIVE MISSIONS</div>
+              <div className="text-[rgb(60,60,60)] text-xs tracking-widest">AWAITING DEPLOYMENT ORDERS</div>
             </div>
-
-            <p className="text-sm text-gray-400 mb-3 font-mono">{mission.target}</p>
-
-            <div className="space-y-3">
-              {/* Progress Bar */}
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-400">Progress</span>
-                  <span className="text-terminal-green">{mission.progress}%</span>
-                </div>
-                <div className="w-full bg-gray-800 rounded-full h-1.5">
-                  <motion.div
-                    className="bg-terminal-green h-1.5 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${mission.progress}%` }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </div>
-              </div>
-
-              {/* Current Phase */}
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">Current Phase</span>
-                <span className="text-xs text-terminal-blue font-medium">
-                  {mission.phase}
-                </span>
-              </div>
-
-              {/* Vulnerabilities Found */}
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">Vulnerabilities Found</span>
-                <div className="flex items-center space-x-1">
-                  <span className="text-xs text-terminal-amber font-medium">
-                    {mission.vulnerabilities}
+          </div>
+        ) : (
+          missions.map((mission) => (
+            <div
+              key={mission.id}
+              className="border border-[rgb(60,60,65)] p-4 bg-[rgb(10,10,12)]"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  <span className={getStatusColor(mission.status)}>
+                    {getStatusIcon(mission.status)}
                   </span>
-                  <AlertTriangle className="h-3 w-3 text-terminal-amber" />
+                  <h4 className="font-medium tracking-wide text-[rgb(180,180,180)]">{mission.name}</h4>
                 </div>
+                <span className="text-[10px] text-[rgb(100,100,105)] tracking-wider font-mono">{mission.id}</span>
               </div>
 
-              {/* Timing */}
-              <div className="flex justify-between items-center text-xs">
-                <div className="flex items-center space-x-1">
-                  <Clock className="h-3 w-3 text-gray-400" />
-                  <span className="text-gray-400">Started: {mission.startTime}</span>
+              <p className="text-xs text-[rgb(100,100,105)] mb-3 font-mono tracking-wide">{mission.target}</p>
+
+              <div className="space-y-3">
+                {/* Progress Bar */}
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-[rgb(100,100,105)] tracking-wider">PROGRESS</span>
+                    <span className={`text-xs font-bold tracking-wider ${getStatusColor(mission.status)}`}>
+                      {mission.progress}%
+                    </span>
+                  </div>
+                  <div className="progress-container">
+                    <div
+                      className={`progress-fill ${
+                        mission.status === 'warning' ? 'warning' :
+                        mission.status === 'critical' ? 'critical' : ''
+                      }`}
+                      style={{ width: `${mission.progress}%`, backgroundColor: getProgressColor(mission.status).replace('bg-', 'rgb(var(--status-green))') }}
+                    />
+                  </div>
                 </div>
-                {mission.estimatedCompletion && (
-                  <span className="text-gray-400">
-                    ETA: {mission.estimatedCompletion}
+
+                {/* Current Phase */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-[rgb(100,100,105)] tracking-wider">CURRENT PHASE</span>
+                  <span className="text-[10px] text-[rgb(180,180,180)] font-medium tracking-wider">
+                    {mission.phase}
                   </span>
-                )}
+                </div>
+
+                {/* Vulnerabilities Found */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-[rgb(100,100,105)] tracking-wider">VULNERABILITIES</span>
+                  <div className="flex items-center space-x-1">
+                    <span className={`text-[10px] font-bold tracking-wider ${getStatusColor(mission.status)}`}>
+                      {mission.vulnerabilities}
+                    </span>
+                    <AlertTriangle className="h-3 w-3 text-[rgb(160,120,60)]" strokeWidth={1.5} />
+                  </div>
+                </div>
+
+                {/* Timing */}
+                <div className="flex justify-between items-center text-xs">
+                  <div className="flex items-center space-x-1">
+                    <Clock className="h-3 w-3 text-[rgb(100,100,105)]" strokeWidth={1.5} />
+                    <span className="text-[rgb(100,100,105)] tracking-wider">START: {mission.startTime}</span>
+                  </div>
+                  {mission.estimatedCompletion && (
+                    <span className="text-[rgb(100,100,105)] tracking-wider">
+                      ETA: {mission.estimatedCompletion}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </motion.div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   )

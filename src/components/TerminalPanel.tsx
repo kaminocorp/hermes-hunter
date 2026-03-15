@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
 
 interface TerminalLine {
   id: string
@@ -18,7 +17,6 @@ export default function TerminalPanel({ type }: TerminalPanelProps) {
   const [lines, setLines] = useState<TerminalLine[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Mock data for demonstration
   useEffect(() => {
     const mockOverseerLines: TerminalLine[] = [
       { id: '1', timestamp: '14:32:15', type: 'command', content: '$ hermes deploy hunter --version v16' },
@@ -38,7 +36,7 @@ export default function TerminalPanel({ type }: TerminalPanelProps) {
       { id: '4', timestamp: '14:33:05', type: 'info', content: '✓ Auth bypass detection active' },
       { id: '5', timestamp: '14:33:08', type: 'output', content: 'Analyzing authentication endpoints...' },
       { id: '6', timestamp: '14:33:15', type: 'command', content: '> scan_auth_bypass --target gitlab-ce' },
-      { id: '7', timestamp: '14:33:18', type: 'info', content: '⚠️ Potential JWT validation bypass found' },
+      { id: '7', timestamp: '14:33:18', type: 'info', content: '⚠ Potential JWT validation bypass found' },
       { id: '8', timestamp: '14:33:22', type: 'output', content: 'Verifying vulnerability...' },
     ]
 
@@ -54,13 +52,13 @@ export default function TerminalPanel({ type }: TerminalPanelProps) {
   const getLineColor = (lineType: string) => {
     switch (lineType) {
       case 'command':
-        return 'text-hermes-primary'
+        return 'text-[rgb(180,180,180)]'
       case 'error':
-        return 'text-terminal-red'
+        return 'text-[rgb(180,50,50)]'
       case 'info':
-        return 'text-terminal-green'
+        return 'text-[rgb(80,140,80)]'
       default:
-        return 'text-terminal-text'
+        return 'text-[rgb(140,140,140)]'
     }
   }
 
@@ -81,31 +79,28 @@ export default function TerminalPanel({ type }: TerminalPanelProps) {
     <div className="h-full flex flex-col">
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-2 font-mono text-sm bg-black/20"
+        className="flex-1 overflow-y-auto px-4 py-2 font-mono text-sm bg-[rgb(10,10,12)]"
       >
-        {lines.map((line, index) => (
-          <motion.div
+        {lines.map((line) => (
+          <div
             key={line.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
             className={`flex items-start space-x-2 mb-1 ${getLineColor(line.type)}`}
           >
-            <span className="text-xs text-gray-500 w-16 flex-shrink-0">
+            <span className="text-[10px] text-[rgb(80,80,80)] w-16 flex-shrink-0 tracking-wider">
               {line.timestamp}
             </span>
-            <span className="flex-1">
+            <span className="flex-1 tracking-wide">
               {getLinePrefix(line.type)}{line.content}
             </span>
-          </motion.div>
+          </div>
         ))}
         <div className="flex items-center space-x-2 mt-2">
-          <span className="text-xs text-gray-500 w-16">
+          <span className="text-[10px] text-[rgb(80,80,80)] w-16 tracking-wider">
             {new Date().toLocaleTimeString([], { hour12: false })}
           </span>
-          <span className="text-hermes-primary">
+          <span className="text-[rgb(180,180,180)]">
             {type === 'overseer' ? '$ ' : '> '}
-            <span className="animate-pulse">█</span>
+            <span className="cursor-blink">█</span>
           </span>
         </div>
       </div>

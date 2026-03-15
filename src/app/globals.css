@@ -2,62 +2,277 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
 :root {
-  --foreground-rgb: 229, 229, 229;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 10, 10, 10;
+  --foreground-rgb: 200, 200, 200;
+  --background-rgb: 5, 5, 8;
+  --imperial-gray: 40, 40, 45;
+  --imperial-dark: 15, 15, 18;
+  --alert-red: 180, 50, 50;
+  --status-green: 80, 140, 80;
+  --warning-amber: 160, 120, 60;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  font-family: 'JetBrains Mono', monospace;
+  background: rgb(var(--background-rgb));
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
 }
 
-/* Custom scrollbar */
+/* Brutalist borders - hard, sharp, no softness */
+.border-panel {
+  border: 2px solid rgb(60, 60, 65);
+  border-radius: 0;
+}
+
+.border-header {
+  border-bottom: 3px solid rgb(80, 80, 85);
+}
+
+.border-separator {
+  border-bottom: 1px solid rgb(50, 50, 55);
+}
+
+/* No glows, no shadows, no blur - pure brutalism */
+.panel-bg {
+  background: rgb(var(--imperial-dark));
+}
+
+.header-bg {
+  background: linear-gradient(180deg, rgb(25, 25, 30) 0%, rgb(15, 15, 18) 100%);
+}
+
+/* Hard status indicators */
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.status-active {
+  color: rgb(var(--status-green));
+}
+
+.status-warning {
+  color: rgb(var(--warning-amber));
+}
+
+.status-critical {
+  color: rgb(var(--alert-red));
+}
+
+.status-idle {
+  color: rgb(80, 80, 80);
+}
+
+/* Scanline effect - subtle but present */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Data blocks - monolithic, imposing */
+.data-block {
+  background: rgb(var(--imperial-dark));
+  border: 1px solid rgb(60, 60, 65);
+  padding: 12px 16px;
+}
+
+.data-block-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgb(100, 100, 105);
+  margin-bottom: 4px;
+}
+
+.data-block-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgb(180, 180, 180);
+}
+
+/* Progress bars - harsh, segmented */
+.progress-container {
+  background: rgb(20, 20, 25);
+  border: 1px solid rgb(50, 50, 55);
+  height: 8px;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgb(var(--status-green));
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 4px,
+    rgba(0, 0, 0, 0.3) 4px,
+    rgba(0, 0, 0, 0.3) 5px
+  );
+}
+
+.progress-fill.warning {
+  background: rgb(var(--warning-amber));
+}
+
+.progress-fill.critical {
+  background: rgb(var(--alert-red));
+}
+
+/* Terminal text - raw, unfiltered */
+.terminal-text {
+  font-family: 'Share Tech Mono', monospace;
+  color: rgb(140, 140, 140);
+}
+
+.terminal-text-highlight {
+  color: rgb(200, 200, 200);
+}
+
+/* Headers - imposing, authoritative */
+.section-header {
+  background: rgb(25, 25, 30);
+  border-bottom: 2px solid rgb(60, 60, 65);
+  padding: 10px 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgb(160, 160, 160);
+}
+
+/* Scrollbar - brutal, functional */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: rgb(10, 10, 12);
+  border-left: 1px solid rgb(40, 40, 45);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #404040;
-  border-radius: 4px;
+  background: rgb(50, 50, 55);
+  border: 1px solid rgb(30, 30, 35);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgb(70, 70, 75);
 }
 
-/* Terminal-like selection */
+/* Selection - harsh contrast */
 ::selection {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgb(180, 50, 50);
+  color: rgb(255, 255, 255);
 }
 
-.terminal-glow {
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.status-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
+/* Blinking cursor - cold, mechanical */
+@keyframes blink {
+  0%, 50% {
     opacity: 1;
   }
-  50% {
-    opacity: .5;
+  51%, 100% {
+    opacity: 0;
   }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Alert pulse - urgent, not decorative */
+@keyframes alert-pulse {
+  0%, 100% {
+    background: rgb(var(--alert-red));
+  }
+  50% {
+    background: rgb(100, 30, 30);
+  }
+}
+
+.alert-pulse {
+  animation: alert-pulse 1.5s ease-in-out infinite;
+}
+
+/* Grid lines - structural, visible */
+.grid-overlay {
+  background-image: 
+    linear-gradient(rgba(60, 60, 65, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(60, 60, 65, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Corner accents - architectural */
+.corner-accent {
+  position: relative;
+}
+
+.corner-accent::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 20px;
+  height: 20px;
+  border-top: 2px solid rgb(80, 80, 85);
+  border-left: 2px solid rgb(80, 80, 85);
+}
+
+.corner-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 20px;
+  height: 20px;
+  border-bottom: 2px solid rgb(80, 80, 85);
+  border-right: 2px solid rgb(80, 80, 85);
+}
+
+/* Data stream animation - cold, mechanical */
+@keyframes data-stream {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.data-stream {
+  animation: data-stream 3s linear infinite;
 }
