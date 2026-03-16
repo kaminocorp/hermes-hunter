@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Terminal, Target, AlertTriangle, Activity, Database, Cpu, Zap, TrendingUp } from 'lucide-react'
+import Link from 'next/link'
+import { Terminal, Target, AlertTriangle, Activity, Database, Cpu, Zap, TrendingUp, FileText } from 'lucide-react'
 import HermesIcon from '@/components/HermesIcon'
 import { useHunterDashboard, useHunterLogs } from '@/hooks/useHunterData'
 import { useOverseerDashboard, useOverseerEvents } from '@/hooks/useOverseerData'
@@ -135,9 +136,9 @@ export default function Dashboard() {
 
               <div className="data-block">
                 <div className="data-block-label">Vulnerabilities</div>
-                <div className="data-block-value text-[rgb(180,50,50)]">
+                <Link href="/reports" className="data-block-value text-[rgb(180,50,50)] hover:text-[rgb(220,80,80)] transition-colors cursor-pointer">
                   {vulnCount.toString().padStart(3, '0')}
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -153,6 +154,13 @@ export default function Dashboard() {
               <Terminal className="h-4 w-4" />
               <span>Overseer Terminal</span>
             </div>
+            <Link
+              href="/reports"
+              className="flex items-center space-x-2 text-[10px] tracking-widest text-[rgb(100,100,105)] hover:text-[rgb(180,180,180)] transition-colors"
+            >
+              <FileText className="w-3 h-3" />
+              <span>REPORTS</span>
+            </Link>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-[rgb(80,140,80)]" />
               <span className="text-[10px] tracking-widest">OPERATIONAL</span>
