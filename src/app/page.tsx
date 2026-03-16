@@ -9,6 +9,7 @@ import { formatTimestamp } from '@/lib/api'
 
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date())
+  // Force Vercel rebuild with timestamp comment: 2026-03-16T00:54Z
   
   // Hunter data
   const { hunterStatus, metrics, vulnerabilities, logs: hunterLogs, logsConnected } = useHunterDashboard()
