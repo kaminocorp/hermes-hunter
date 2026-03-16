@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Terminal, Target, Shield, AlertTriangle, Activity, Database, Cpu, Zap, TrendingUp } from 'lucide-react'
-import { useHunterDashboard, useOverseerEvents, useHunterLogs } from '@/hooks/useHunterData'
-import { useOverseerDashboard } from '@/hooks/useOverseerData'
+import { useHunterDashboard, useHunterLogs } from '@/hooks/useHunterData'
+import { useOverseerDashboard, useOverseerEvents } from '@/hooks/useOverseerData'
 import { formatTimestamp } from '@/lib/api'
 
 export default function Dashboard() {
