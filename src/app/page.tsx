@@ -144,7 +144,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex-1 p-4 font-mono text-sm overflow-y-auto" ref={scrollRef}>
+          <div className="flex-1 min-h-0 p-4 font-mono text-sm overflow-y-auto" ref={scrollRef}>
             <div className="terminal-text space-y-1">
               {allLogs.length === 0 ? (
                 <>
