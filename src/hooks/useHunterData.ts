@@ -123,7 +123,6 @@ export function useHunterLogs(initialLimit = 50) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setConnected(true);
     setError(null);
 
     const cleanup = subscribeToHunterLogs(
@@ -135,8 +134,11 @@ export function useHunterLogs(initialLimit = 50) {
         });
       },
       () => {
+        setConnected(true);
+        setError(null);
+      },
+      () => {
         setConnected(false);
-        setError('Connection lost. Reconnecting...');
       }
     );
 

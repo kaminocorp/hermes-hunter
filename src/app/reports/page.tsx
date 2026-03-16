@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Shield, AlertTriangle, AlertCircle, Info, FileText, ExternalLink, Code, Bug, Lock, Database, Eye } from 'lucide-react'
 import { fetchVulnerabilities, fetchVulnerability, type Vulnerability, type VulnerabilityReport } from '@/lib/api'
@@ -340,9 +339,9 @@ function VulnerabilityDetail({ vulnId, onBack }: { vulnId: string; onBack: () =>
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="h-screen flex flex-col bg-[rgb(5,5,8)]">
       {/* Header */}
-      <div className="border-b border-[rgb(40,40,45)] bg-[rgb(10,10,15)]">
+      <div className="border-b border-[rgb(40,40,45)] bg-[rgb(10,10,15)] shrink-0">
         <div className="flex items-center justify-between px-6 py-4">
           <button
             onClick={onBack}
@@ -351,7 +350,7 @@ function VulnerabilityDetail({ vulnId, onBack }: { vulnId: string; onBack: () =>
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-mono">Back to Reports</span>
           </button>
-          
+
           <div className="flex items-center space-x-4">
             <div className={`px-3 py-1 ${config.bg} bg-opacity-10 border ${config.border} rounded-sm`}>
               <span className={`text-[10px] font-bold tracking-widest ${config.color}`}>{severity}</span>
@@ -365,9 +364,9 @@ function VulnerabilityDetail({ vulnId, onBack }: { vulnId: string; onBack: () =>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-4xl mx-auto">
+      {/* Scrollable Content */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-6">
+        <div className="max-w-4xl mx-auto pb-12">
           {renderMarkdown(report.content)}
         </div>
       </div>
@@ -377,20 +376,16 @@ function VulnerabilityDetail({ vulnId, onBack }: { vulnId: string; onBack: () =>
 
 // Main Page Component
 export default function ReportsPage() {
-  const params = useParams()
   const [selectedVuln, setSelectedVuln] = useState<Vulnerability | null>(null)
 
-  // Check if we have a selected vulnerability from query param or state
-  const vulnId = typeof params?.id === 'string' ? params.id : selectedVuln?.id
-
-  if (vulnId) {
-    return <VulnerabilityDetail vulnId={vulnId} onBack={() => setSelectedVuln(null)} />
+  if (selectedVuln) {
+    return <VulnerabilityDetail vulnId={selectedVuln.id} onBack={() => setSelectedVuln(null)} />
   }
 
   return (
-    <div className="flex flex-col min-h-full bg-[rgb(5,5,8)]">
+    <div className="h-screen flex flex-col bg-[rgb(5,5,8)]">
       {/* Header */}
-      <div className="border-b border-[rgb(40,40,45)] bg-[rgb(10,10,15)]">
+      <div className="border-b border-[rgb(40,40,45)] bg-[rgb(10,10,15)] shrink-0">
         <div className="flex items-center justify-between px-6 py-4">
           <Link
             href="/"
@@ -399,20 +394,22 @@ export default function ReportsPage() {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-mono">Back to Dashboard</span>
           </Link>
-          
+
           <div className="flex items-center space-x-3">
             <Shield className="w-5 h-5 text-[rgb(100,100,105)]" />
             <h1 className="text-lg font-bold text-[rgb(200,200,200)] uppercase tracking-widest">
               Vulnerability Reports
             </h1>
           </div>
-          
+
           <div className="w-32" /> {/* Spacer for centering */}
         </div>
       </div>
 
-      {/* List */}
-      <VulnerabilityList onSelect={setSelectedVuln} />
+      {/* Scrollable List */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <VulnerabilityList onSelect={setSelectedVuln} />
+      </div>
     </div>
   )
 }

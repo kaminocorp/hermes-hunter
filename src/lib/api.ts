@@ -119,24 +119,34 @@ export async function fetchVulnerability(id: string): Promise<VulnerabilityRepor
 
 export function subscribeToHunterLogs(
   onMessage: (entry: LogEntry) => void,
+  onOpen?: () => void,
   onError?: (error: Event) => void
 ): () => void {
   const eventSource = new EventSource(`${HUNTER_API_URL}/api/logs/stream`);
-  
+  let errorLogged = false;
+
+  eventSource.onopen = () => {
+    errorLogged = false;
+    onOpen?.();
+  };
+
   eventSource.onmessage = (event) => {
     try {
       const entry: LogEntry = JSON.parse(event.data);
       onMessage(entry);
     } catch (e) {
-      console.error('Error parsing log entry:', e);
+      console.warn('Error parsing log entry:', e);
     }
   };
-  
+
   eventSource.onerror = (error) => {
-    console.error('Hunter log stream error:', error);
+    if (!errorLogged) {
+      console.warn('Hunter log stream disconnected, will retry automatically');
+      errorLogged = true;
+    }
     onError?.(error);
   };
-  
+
   // Return cleanup function
   return () => {
     eventSource.close();
@@ -247,18 +257,26 @@ export function subscribeToOverseerEvents(
   }
   
   const eventSource = new EventSource(`${OVERSEER_API_URL}/overseer/events/stream`);
-  
+  let errorLogged = false;
+
+  eventSource.onopen = () => {
+    errorLogged = false;
+  };
+
   eventSource.onmessage = (event) => {
     try {
       const message = JSON.parse(event.data);
       onMessage(message);
     } catch (e) {
-      console.error('Error parsing Overseer event:', e);
+      console.warn('Error parsing Overseer event:', e);
     }
   };
-  
+
   eventSource.onerror = (error) => {
-    console.error('Overseer event stream error:', error);
+    if (!errorLogged) {
+      console.warn('Overseer event stream disconnected, will retry automatically');
+      errorLogged = true;
+    }
     onError?.(error);
   };
   
