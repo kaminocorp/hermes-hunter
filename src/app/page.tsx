@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Terminal, Target, Shield, AlertTriangle, Activity, Database, Cpu, Zap, TrendingUp } from 'lucide-react'
+import { Terminal, Target, AlertTriangle, Activity, Database, Cpu, Zap, TrendingUp } from 'lucide-react'
+import HermesIcon from '@/components/HermesIcon'
 import { useHunterDashboard, useHunterLogs } from '@/hooks/useHunterData'
 import { useOverseerDashboard, useOverseerEvents } from '@/hooks/useOverseerData'
 import { formatTimestamp } from '@/lib/api'
@@ -63,7 +64,7 @@ export default function Dashboard() {
       <header className="header-bg border-header px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Shield className="h-10 w-10 text-[rgb(160,160,160)]" strokeWidth={1.5} />
+            <HermesIcon size={40} className="text-[rgb(160,160,160)]" />
             <div>
               <h1 className="text-2xl font-bold tracking-widest uppercase text-[rgb(200,200,200)]">
                 Hermes Hunter
