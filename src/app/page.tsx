@@ -8,8 +8,16 @@ import { useOverseerDashboard, useOverseerEvents } from '@/hooks/useOverseerData
 import { formatTimestamp } from '@/lib/api'
 
 export default function Dashboard() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-  // Force Vercel rebuild: CORS fixed on Hunter API 2026-03-16T01:05Z
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
+  const [mounted, setMounted] = useState(false)
+  
+  // Fix hydration mismatch - wait for client mount
+  useEffect(() => {
+    setMounted(true)
+    setCurrentTime(new Date())
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
   
   // Hunter data
   const { hunterStatus, metrics, vulnerabilities, logs: hunterLogs, logsConnected } = useHunterDashboard()
@@ -81,7 +89,7 @@ export default function Dashboard() {
             <div className="text-right">
               <div className="text-xs text-[rgb(100,100,105)] tracking-widest uppercase">System Time</div>
               <div className="text-lg font-bold text-[rgb(180,180,180)] tracking-wider">
-                {formatTime(currentTime)}
+                {mounted && currentTime ? formatTime(currentTime) : '--:--:--'}
               </div>
             </div>
 
