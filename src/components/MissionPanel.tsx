@@ -50,15 +50,15 @@ export default function MissionPanel() {
   const getProgressColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-[rgb(80,140,80)]'
+        return '[rgb(80,140,80)]'
       case 'completed':
-        return 'bg-[rgb(180,180,180)]'
+        return '[rgb(180,180,180)]'
       case 'paused':
-        return 'bg-[rgb(160,120,60)]'
+        return '[rgb(160,120,60)]'
       case 'failed':
-        return 'bg-[rgb(180,50,50)]'
+        return '[rgb(180,50,50)]'
       default:
-        return 'bg-[rgb(100,100,105)]'
+        return '[rgb(100,100,105)]'
     }
   }
 
@@ -109,11 +109,8 @@ export default function MissionPanel() {
                   </div>
                   <div className="progress-container">
                     <div
-                      className={`progress-fill ${
-                        mission.status === 'warning' ? 'warning' :
-                        mission.status === 'critical' ? 'critical' : ''
-                      }`}
-                      style={{ width: `${mission.progress}%`, backgroundColor: getProgressColor(mission.status).replace('bg-', 'rgb(var(--status-green))') }}
+                      className={`progress-fill ${getProgressColor(mission.status).replace('bg-', '')}`}
+                      style={{ width: `${mission.progress}%` }}
                     />
                   </div>
                 </div>
