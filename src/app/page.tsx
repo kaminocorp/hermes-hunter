@@ -1,24 +1,58 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Terminal, Target, Shield, AlertTriangle, Activity, Database, Cpu, Zap, TrendingUp } from 'lucide-react'
+import { useHunterDashboard, useOverseerEvents, useHunterLogs } from '@/hooks/useHunterData'
+import { useOverseerDashboard } from '@/hooks/useOverseerData'
+import { formatTimestamp } from '@/lib/api'
 
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [hunterApiStatus, setHunterApiStatus] = useState('ONLINE')
-  const [activeMissions, setActiveMissions] = useState(0)
-  const [vulnerabilitiesFound, setVulnerabilitiesFound] = useState(0)
-  const [cpuUsage] = useState(23)
-  const [memoryUsage] = useState(42)
+  
+  // Hunter data
+  const { hunterStatus, metrics, vulnerabilities, logs: hunterLogs, logsConnected } = useHunterDashboard()
+  const overseerEvents = useOverseerEvents()
+  
+  // Combine logs from both sources
+  const [allLogs, setAllLogs] = useState<Array<{timestamp: string; type: string; message: string; source: string}>>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    // Merge and sort logs from both sources
+    const merged = [
+      ...hunterLogs.map(log => ({ ...log, source: 'HUNTER' })),
+      ...overseerEvents.events.map(event => ({
+        timestamp: event.timestamp,
+        type: event.type || 'info',
+        message: event.content,
+        source: 'OVERSEER'
+      }))
+    ].sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+    
+    setAllLogs(merged.slice(-100)) // Keep last 100
+  }, [hunterLogs, overseerEvents.events])
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [allLogs])
+
   const formatTime = (date: Date) => {
     return date.toISOString().replace('T', ' ').substring(0, 19) + ' UTC'
   }
+
+  // Get active mission count from metrics or status
+  const activeMissions = metrics?.missions?.active || hunterStatus?.active_missions || 0
+  const vulnCount = vulnerabilities?.length || 0
+
+  const cpuUsage = metrics?.system?.workspace_size_mb ? Math.min(metrics.system.workspace_size_mb, 100) : 23
+  const memoryUsage = metrics?.performance?.success_rate ? parseInt(metrics.performance.success_rate) || 42 : 42
 
   return (
     <div className="min-h-screen bg-[rgb(5,5,8)] relative">
@@ -61,9 +95,9 @@ export default function Dashboard() {
 
               <div className="data-block">
                 <div className="data-block-label">Hunter</div>
-                <div className="data-block-value status-idle flex items-center space-x-2">
-                  <div className="status-indicator status-idle" />
-                  <span>IDLE</span>
+                <div className={`data-block-value flex items-center space-x-2 ${hunterStatus ? 'status-active' : 'status-idle'}`}>
+                  <div className={`status-indicator ${hunterStatus ? 'status-active' : 'status-idle'}`} />
+                  <span>{hunterStatus ? hunterStatus.status.toUpperCase() : 'OFFLINE'}</span>
                 </div>
               </div>
 
@@ -77,7 +111,7 @@ export default function Dashboard() {
               <div className="data-block">
                 <div className="data-block-label">Vulnerabilities</div>
                 <div className="data-block-value text-[rgb(180,50,50)]">
-                  {vulnerabilitiesFound.toString().padStart(3, '0')}
+                  {vulnCount.toString().padStart(3, '0')}
                 </div>
               </div>
             </div>
@@ -87,7 +121,7 @@ export default function Dashboard() {
 
       {/* Main Grid */}
       <div className="grid grid-cols-2 h-[calc(100vh-120px)]">
-        {/* Left - Overseer Operations */}
+        {/* Left - Overseer Terminal */}
         <div className="border-r border-[rgb(60,60,65)] flex flex-col">
           <div className="section-header corner-accent flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -100,16 +134,30 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex-1 p-4 font-mono text-sm overflow-auto">
+          <div className="flex-1 p-4 font-mono text-sm overflow-auto" ref={scrollRef}>
             <div className="terminal-text space-y-1">
-              <div className="terminal-text-highlight">{`[SYSTEM] Hermes Alpha v13.0 initialized`}</div>
-              <div>{`[STATUS] Monitoring Hunter API endpoint...`}</div>
-              <div>{`[TARGET] kaminocorp/hermes-alpha-hunter`}</div>
-              <div>{`[REGION] Singapore (sin)`}</div>
-              <div className="text-[rgb(100,100,105)]">{`Last check: ${formatTime(currentTime)}`}</div>
-              <div className="h-4" />
-              <div className="text-[rgb(100,100,105)]">{`// Awaiting mission directives...`}</div>
-              <div className="cursor-blink">_</div>
+              {allLogs.length === 0 ? (
+                <>
+                  <div className="terminal-text-highlight">{`[SYSTEM] Hermes Alpha v13.0 initialized`}</div>
+                  <div>{`[STATUS] Monitoring Hunter API endpoint...`}</div>
+                  <div>{`[TARGET] kaminocorp/hermes-alpha-hunter`}</div>
+                  <div>{`[REGION] Singapore (sin)`}</div>
+                  <div className="text-[rgb(100,100,105)]">{`Last check: ${formatTime(currentTime)}`}</div>
+                  <div className="h-4" />
+                  <div className="text-[rgb(100,100,105)]">{`// Awaiting live data stream...`}</div>
+                </>
+              ) : (
+                allLogs.map((log, i) => (
+                  <div key={i} className={`${log.source === 'HUNTER' ? 'text-[rgb(80,140,80)]' : 'text-[rgb(180,180,180)]'}`}>
+                    <span className="text-[10px] text-[rgb(80,80,80)] mr-2">
+                      {log.timestamp.substring(11, 19)}
+                    </span>
+                    <span className="text-[10px] text-[rgb(100,100,105)] mr-2">[{log.source}]</span>
+                    {log.message}
+                  </div>
+                ))
+              )}
+              <div className="cursor-blink">█</div>
             </div>
           </div>
         </div>
@@ -122,8 +170,10 @@ export default function Dashboard() {
               <span>Hunter Operations</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-[rgb(80,80,80)]" />
-              <span className="text-[10px] tracking-widest">STANDBY</span>
+              <div className={`w-2 h-2 ${logsConnected ? 'bg-[rgb(80,140,80)]' : 'bg-[rgb(160,120,60)]'}`} />
+              <span className="text-[10px] tracking-widest">
+                {logsConnected ? 'CONNECTED' : 'DISCONNECTED'}
+              </span>
             </div>
           </div>
 
@@ -137,19 +187,28 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {/* Mission slots when active */}
+                  {/* Will populate when missions are active */}
+                  <div className="text-[rgb(180,180,180)]">Mission active...</div>
                 </div>
               )}
             </div>
 
-            {/* Hunter Terminal */}
+            {/* Hunter Status */}
             <div className="h-1/2 p-4 font-mono text-sm overflow-auto">
-              <div className="terminal-text space-y-1">
-                <div className="terminal-text-highlight">{`[HUNTER] API v13 ready`}</div>
-                <div>{`[TOOLS] web_search, web_extract, terminal, browser`}</div>
-                <div className="text-[rgb(100,100,105)]">{`[CONFIG] deepseek/deepseek-v3 (default)`}</div>
+              <div className="terminal-text space-y-2">
+                <div className="terminal-text-highlight">{`[HUNTER] API ${metrics?.status || 'STATUS UNKNOWN'}`}</div>
+                {metrics && (
+                  <>
+                    <div>{`[MISSIONS] ${metrics.missions.completed} completed, ${metrics.missions.failed} failed`}</div>
+                    <div>{`[SUCCESS RATE] ${metrics.performance.success_rate}`}</div>
+                    <div>{`[AVG DURATION] ${metrics.performance.avg_mission_duration}`}</div>
+                    <div>{`[WORKSPACE] ${metrics.system.workspace_size_mb} MB`}</div>
+                  </>
+                )}
                 <div className="h-2" />
-                <div className="text-[rgb(80,140,80)]">{`[READY] Awaiting mission parameters...`}</div>
+                <div className={`text-[rgb(80,140,80)]`}>
+                  {`[STREAM] ${logsConnected ? 'LIVE' : 'DISCONNECTED'} - receiving telemetry...`}
+                </div>
                 <div className="cursor-blink">_</div>
               </div>
             </div>
@@ -171,28 +230,28 @@ export default function Dashboard() {
           <div className="data-block">
             <div className="flex items-center space-x-2 mb-2">
               <Cpu className="h-3 w-3 text-[rgb(100,100,105)]" />
-              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">CPU</span>
+              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">WORKSPACE</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(180,180,180)]">{cpuUsage}%</div>
+            <div className="text-lg font-bold text-[rgb(180,180,180)]">{metrics?.system?.workspace_size_mb || '--'} MB</div>
             <div className="progress-container mt-2">
               <div 
                 className="progress-fill" 
-                style={{ width: `${cpuUsage}%` }}
+                style={{ width: `${Math.min((metrics?.system?.workspace_size_mb || 0) / 10, 100)}%` }}
               />
             </div>
           </div>
 
-          {/* Memory */}
+          {/* Success Rate */}
           <div className="data-block">
             <div className="flex items-center space-x-2 mb-2">
               <Activity className="h-3 w-3 text-[rgb(100,100,105)]" />
-              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">MEMORY</span>
+              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">SUCCESS RATE</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(180,180,180)]">{memoryUsage}%</div>
+            <div className="text-lg font-bold text-[rgb(180,180,180)]">{metrics?.performance?.success_rate || '--'}</div>
             <div className="progress-container mt-2">
               <div 
                 className="progress-fill" 
-                style={{ width: `${memoryUsage}%` }}
+                style={{ width: `${parseInt(metrics?.performance?.success_rate || '0') || 0}%` }}
               />
             </div>
           </div>
@@ -203,33 +262,37 @@ export default function Dashboard() {
               <Database className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">HUNTER API</span>
             </div>
-            <div className="text-lg font-bold status-active">{hunterApiStatus}</div>
+            <div className={`text-lg font-bold ${hunterStatus ? 'status-active' : 'status-idle'}`}>
+              {hunterStatus ? 'ONLINE' : 'OFFLINE'}
+            </div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
               hermes-alpha-hunter.fly.dev
             </div>
           </div>
 
-          {/* Response Time */}
+          {/* Log Stream */}
           <div className="data-block">
             <div className="flex items-center space-x-2 mb-2">
               <Zap className="h-3 w-3 text-[rgb(100,100,105)]" />
-              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">LATENCY</span>
+              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">LOG STREAM</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(180,180,180)]">89ms</div>
+            <div className={`text-lg font-bold ${logsConnected ? 'status-active' : 'status-warning'}`}>
+              {logsConnected ? 'LIVE' : 'OFFLINE'}
+            </div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
-              SIN region
+              {allLogs.length} entries
             </div>
           </div>
 
-          {/* Analysis Rate */}
+          {/* Vulnerabilities */}
           <div className="data-block">
             <div className="flex items-center space-x-2 mb-2">
               <TrendingUp className="h-3 w-3 text-[rgb(100,100,105)]" />
-              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">THROUGHPUT</span>
+              <span className="text-xs text-[rgb(100,100,105)] tracking-wider">VULNERABILITIES</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(80,80,80)]">--</div>
+            <div className="text-lg font-bold text-[rgb(180,50,50)]">{vulnCount}</div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
-              files/min
+              Total found
             </div>
           </div>
 
