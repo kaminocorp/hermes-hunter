@@ -152,7 +152,7 @@ export default function Dashboard() {
                   <div>{`[STATUS] Monitoring Hunter API endpoint...`}</div>
                   <div>{`[TARGET] kaminocorp/hermes-alpha-hunter`}</div>
                   <div>{`[REGION] Singapore (sin)`}</div>
-                  <div className="text-[rgb(100,100,105)]">{`Last check: ${formatTime(currentTime)}`}</div>
+                  <div className="text-[rgb(100,100,105)]">{`Last check: ${mounted && currentTime ? formatTime(currentTime) : '------'}`}</div>
                   <div className="h-4" />
                   <div className="text-[rgb(100,100,105)]">{`// Awaiting live data stream...`}</div>
                 </>
