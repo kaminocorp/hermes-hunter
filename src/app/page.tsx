@@ -65,20 +65,35 @@ export default function Dashboard() {
   const memoryUsage = metrics?.performance?.success_rate ? parseInt(metrics.performance.success_rate) || 42 : 42
 
   return (
-    <div className="min-h-screen bg-[rgb(5,5,8)] relative">
+    <div className="h-screen bg-[rgb(5,5,8)] relative flex flex-col">
       {/* Scanline overlay */}
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
       {/* Header - Imperial Command */}
-      <header className="header-bg border-header px-6 py-4">
-        <div className="flex items-center justify-between">
+      <header className="header-bg border-header px-6 py-8 relative overflow-hidden min-h-[140px] shrink-0">
+        {/* Hero angel image */}
+        <div className="hero-image-container">
+          <picture>
+            <source srcSet="/images/hermes-angel.avif" type="image/avif" />
+            <source srcSet="/images/hermes-angel.webp" type="image/webp" />
+            <img
+              src="/images/hermes-angel.png"
+              alt=""
+              className="hero-image"
+              loading="eager"
+            />
+          </picture>
+          <div className="hero-overlay" />
+        </div>
+
+        <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center space-x-4">
-            <HermesIcon size={40} className="text-[rgb(160,160,160)]" />
+            <HermesIcon size={40} className="text-[rgb(200,200,200)]" />
             <div>
-              <h1 className="text-2xl font-bold tracking-widest uppercase text-[rgb(200,200,200)]">
+              <h1 className="font-display text-2xl font-bold tracking-widest uppercase text-[rgb(220,220,220)]">
                 Hermes Hunter
               </h1>
-              <p className="text-xs tracking-[3px] text-[rgb(100,100,105)] uppercase">
+              <p className="font-display text-xs tracking-[3px] text-[rgb(140,140,145)] uppercase">
                 Vulnerability Discovery Command
               </p>
             </div>
@@ -130,9 +145,9 @@ export default function Dashboard() {
       </header>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-2 h-[calc(100vh-120px)]">
+      <div className="grid grid-cols-2 flex-1 min-h-0">
         {/* Left - Overseer Terminal */}
-        <div className="border-r border-[rgb(60,60,65)] flex flex-col">
+        <div className="border-r border-[rgb(60,60,65)] flex flex-col min-h-0">
           <div className="section-header corner-accent flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Terminal className="h-4 w-4" />
@@ -173,7 +188,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right - Hunter Operations */}
-        <div className="flex flex-col">
+        <div className="flex flex-col min-h-0">
           <div className="section-header corner-accent flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Target className="h-4 w-4" />
@@ -187,9 +202,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 min-h-0 flex flex-col">
             {/* Mission Status */}
-            <div className="h-1/2 border-b border-[rgb(60,60,65)] p-4">
+            <div className="h-1/2 min-h-0 border-b border-[rgb(60,60,65)] p-4 overflow-y-auto">
               <div className="text-xs text-[rgb(100,100,105)] tracking-widest uppercase mb-3">Active Missions</div>
               {activeMissions === 0 ? (
                 <div className="terminal-text text-[rgb(80,80,80)] italic">
@@ -204,7 +219,7 @@ export default function Dashboard() {
             </div>
 
             {/* Hunter Status */}
-            <div className="h-1/2 p-4 font-mono text-sm overflow-auto">
+            <div className="h-1/2 min-h-0 p-4 font-mono text-sm overflow-y-auto">
               <div className="terminal-text space-y-2">
                 <div className="terminal-text-highlight">{`[HUNTER] API ${metrics?.status || 'STATUS UNKNOWN'}`}</div>
                 {metrics && (
@@ -227,7 +242,7 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom - System Metrics */}
-      <footer className="border-t border-[rgb(60,60,65)] bg-[rgb(10,10,12)] px-6 py-4">
+      <footer className="border-t border-[rgb(60,60,65)] bg-[rgb(10,10,12)] px-6 py-4 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="text-xs text-[rgb(100,100,105)] tracking-widest uppercase">System Metrics</div>
           <div className="text-[10px] text-[rgb(80,80,80)] tracking-wider">

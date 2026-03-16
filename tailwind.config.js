@@ -18,7 +18,8 @@ module.exports = {
         'hermes-secondary': '#8b5cf6',
       },
       fontFamily: {
-        'mono': ['JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'monospace'],
+        'mono': ['Share Tech Mono', 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'monospace'],
+        'display': ['Cinzel', 'serif'],
       },
     },
   },
