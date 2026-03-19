@@ -221,7 +221,7 @@ ${modalReport.content
       <div className="scanlines fixed inset-0 pointer-events-none z-50" />
 
       {/* Header - Imperial Command */}
-      <header className="header-bg border-header px-6 py-8 relative overflow-hidden min-h-[140px] shrink-0">
+      <header className="header-bg border-header px-4 py-4 md:px-6 md:py-8 relative overflow-hidden min-h-[100px] md:min-h-[140px] shrink-0">
         {/* Hero angel image */}
         <div className="hero-image-container">
           <picture>
@@ -237,22 +237,22 @@ ${modalReport.content
           <div className="hero-overlay" />
         </div>
 
-        <div className="flex items-center justify-between relative z-10">
+        <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between relative z-10">
           <div className="flex items-center space-x-4">
             <HermesIcon size={40} className="text-[rgb(200,200,200)]" />
             <div>
-              <h1 className="font-display text-2xl font-bold tracking-widest uppercase text-[rgb(220,220,220)]">
+              <h1 className="font-display text-xl md:text-2xl font-bold tracking-widest uppercase text-[rgb(220,220,220)]">
                 Hermes Hunter
               </h1>
-              <p className="font-display text-xs tracking-[3px] text-[rgb(140,140,145)] uppercase">
+              <p className="font-display text-xs tracking-[3px] text-[rgb(140,140,145)] uppercase hidden md:block">
                 Vulnerability Discovery Command
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-8">
+          <div className="flex flex-wrap items-center gap-3 md:gap-0 md:space-x-8">
             {/* System Time */}
-            <div className="text-right">
+            <div className="text-right hidden md:block">
               <div className="text-xs text-[rgb(100,100,105)] tracking-widest uppercase">System Time</div>
               <div className="text-lg font-bold text-[rgb(180,180,180)] tracking-wider">
                 {mounted && currentTime ? formatTime(currentTime) : '--:--:--'}
@@ -260,7 +260,7 @@ ${modalReport.content
             </div>
 
             {/* Status Block */}
-            <div className="flex items-center space-x-6">
+            <div className="flex flex-wrap items-center gap-2 md:gap-0 md:space-x-6">
               <div className="data-block">
                 <div className="data-block-label">Overseer</div>
                 <div className="data-block-value status-active flex items-center space-x-2">
@@ -296,9 +296,9 @@ ${modalReport.content
       </header>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-2 flex-1 min-h-0">
+      <div className="flex flex-col md:grid md:grid-cols-2 flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
         {/* Left - Overseer Terminal */}
-        <div className="border-r border-[rgb(60,60,65)] flex flex-col min-h-0">
+        <div className="border-b md:border-b-0 md:border-r border-[rgb(60,60,65)] flex flex-col min-h-[300px] md:min-h-0">
           <div className="section-header corner-accent flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Terminal className="h-4 w-4" />
@@ -346,7 +346,7 @@ ${modalReport.content
         </div>
 
         {/* Right - Hunter Operations */}
-        <div className="flex flex-col min-h-0">
+        <div className="flex flex-col min-h-[300px] md:min-h-0">
           <div className="section-header corner-accent flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Target className="h-4 w-4" />
@@ -456,7 +456,7 @@ ${modalReport.content
       </div>
 
       {/* Bottom - System Metrics */}
-      <footer className="border-t border-[rgb(60,60,65)] bg-[rgb(10,10,12)] px-6 py-4 shrink-0">
+      <footer className="border-t border-[rgb(60,60,65)] bg-[rgb(10,10,12)] px-3 py-3 md:px-6 md:py-4 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <div className="text-xs text-[rgb(100,100,105)] tracking-widest uppercase">System Metrics</div>
           <div className="text-[10px] text-[rgb(80,80,80)] tracking-wider">
@@ -464,14 +464,14 @@ ${modalReport.content
           </div>
         </div>
 
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6 md:gap-4">
           {/* CPU */}
           <div className="data-block">
             <div className="flex items-center space-x-2 mb-2">
               <Cpu className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">WORKSPACE</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(180,180,180)]">{metrics?.system?.workspace_size_mb || '--'} MB</div>
+            <div className="text-base md:text-lg font-bold text-[rgb(180,180,180)]">{metrics?.system?.workspace_size_mb || '--'} MB</div>
             <div className="progress-container mt-2">
               <div 
                 className="progress-fill" 
@@ -486,7 +486,7 @@ ${modalReport.content
               <Activity className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">SUCCESS RATE</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(180,180,180)]">{metrics?.performance?.success_rate || '--'}</div>
+            <div className="text-base md:text-lg font-bold text-[rgb(180,180,180)]">{metrics?.performance?.success_rate || '--'}</div>
             <div className="progress-container mt-2">
               <div 
                 className="progress-fill" 
@@ -501,7 +501,7 @@ ${modalReport.content
               <Database className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">HUNTER API</span>
             </div>
-            <div className={`text-lg font-bold ${hunterStatus ? 'status-active' : 'status-idle'}`}>
+            <div className={`text-base md:text-lg font-bold ${hunterStatus ? 'status-active' : 'status-idle'}`}>
               {hunterStatus ? 'ONLINE' : 'OFFLINE'}
             </div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
@@ -515,7 +515,7 @@ ${modalReport.content
               <Zap className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">LOG STREAM</span>
             </div>
-            <div className={`text-lg font-bold ${logsConnected ? 'status-active' : 'status-warning'}`}>
+            <div className={`text-base md:text-lg font-bold ${logsConnected ? 'status-active' : 'status-warning'}`}>
               {logsConnected ? 'LIVE' : 'OFFLINE'}
             </div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
@@ -529,7 +529,7 @@ ${modalReport.content
               <TrendingUp className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">VULNERABILITIES</span>
             </div>
-            <div className="text-lg font-bold text-[rgb(180,50,50)]">{vulnCount}</div>
+            <div className="text-base md:text-lg font-bold text-[rgb(180,50,50)]">{vulnCount}</div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
               Total found
             </div>
@@ -541,7 +541,7 @@ ${modalReport.content
               <AlertTriangle className="h-3 w-3 text-[rgb(100,100,105)]" />
               <span className="text-xs text-[rgb(100,100,105)] tracking-wider">ALERTS</span>
             </div>
-            <div className="text-lg font-bold status-active">CLEAR</div>
+            <div className="text-base md:text-lg font-bold status-active">CLEAR</div>
             <div className="text-[10px] text-[rgb(100,100,105)] mt-1">
               No anomalies
             </div>
@@ -561,8 +561,8 @@ ${modalReport.content
           {/* Modal */}
           <div className="relative w-full max-w-3xl max-h-[85vh] mx-4 flex flex-col bg-[rgb(8,8,12)] border border-[rgb(50,50,55)] rounded-sm shadow-2xl">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(40,40,45)] shrink-0">
-              <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-[rgb(40,40,45)] shrink-0">
+              <div className="flex flex-wrap items-center gap-2 md:gap-0 md:space-x-4">
                 <Shield className="w-4 h-4 text-[rgb(100,100,105)]" />
                 <span className="text-xs font-bold text-[rgb(160,160,165)] uppercase tracking-widest">
                   Vulnerability Report
@@ -594,7 +594,7 @@ ${modalReport.content
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-6">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6">
               {modalLoading ? (
                 <div className="flex items-center justify-center py-20">
                   <div className="text-[rgb(100,100,105)] font-mono text-sm animate-pulse">
@@ -609,7 +609,7 @@ ${modalReport.content
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between px-6 py-3 border-t border-[rgb(40,40,45)] shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 md:px-6 border-t border-[rgb(40,40,45)] shrink-0">
               <span className="text-[9px] text-[rgb(60,60,65)] font-mono tracking-wider">
                 {modalReport ? new Date(modalReport.discovered_at).toLocaleString() : ''}
               </span>

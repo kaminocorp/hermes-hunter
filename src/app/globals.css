@@ -307,6 +307,24 @@ body {
   opacity: 0.5;
 }
 
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .section-header {
+    padding: 8px 12px;
+    letter-spacing: 1px;
+    font-size: 10px;
+  }
+
+  .data-block {
+    padding: 8px 12px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
 .hero-overlay {
   position: absolute;
   inset: 0;

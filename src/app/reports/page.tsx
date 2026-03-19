@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Shield, AlertTriangle, AlertCircle, Info, FileText, ExternalLink, Code, Bug, Lock, Database, Eye } from 'lucide-react'
+import { ArrowLeft, Shield, AlertTriangle, AlertCircle, Info, FileText, ExternalLink, Code, Bug, Lock, Database, Eye, Download } from 'lucide-react'
 import { fetchVulnerabilities, fetchVulnerability, type Vulnerability, type VulnerabilityReport } from '@/lib/api'
 
 // Severity configuration
@@ -81,11 +81,43 @@ function extractDescription(content: string): string {
   return ''
 }
 
+// Download report as .md file
+function downloadMarkdown(content: string, filename: string) {
+  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename.replace(/[^a-zA-Z0-9_-]/g, '_') + '.md'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+function sanitizeFilename(title: string): string {
+  return title.replace(/^#.*?:\s*/, '').trim().substring(0, 60)
+}
+
 // Vulnerability List Component
 function VulnerabilityList({ onSelect }: { onSelect: (vuln: Vulnerability) => void }) {
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [downloading, setDownloading] = useState<string | null>(null)
+
+  async function handleDownload(e: React.MouseEvent, vuln: Vulnerability) {
+    e.stopPropagation()
+    setDownloading(vuln.id)
+    try {
+      const report = await fetchVulnerability(vuln.id)
+      const title = sanitizeFilename(vuln.preview.split('\n')[0] || `vulnerability_${vuln.id}`)
+      downloadMarkdown(report.content, title)
+    } catch {
+      // silently fail — the user can see the card is no longer loading
+    } finally {
+      setDownloading(null)
+    }
+  }
 
   useEffect(() => {
     fetchVulnerabilities()
@@ -140,7 +172,7 @@ function VulnerabilityList({ onSelect }: { onSelect: (vuln: Vulnerability) => vo
   })
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4 md:gap-4 md:p-6">
       {sorted.map((vuln) => {
         const severity = extractSeverity(vuln.preview)
         const config = severityConfig[severity] || severityConfig.MEDIUM
@@ -183,9 +215,19 @@ function VulnerabilityList({ onSelect }: { onSelect: (vuln: Vulnerability) => vo
               <span className="text-[9px] text-[rgb(80,80,85)] font-mono">
                 {new Date(vuln.discovered_at).toLocaleDateString()}
               </span>
-              <span className="text-[9px] text-[rgb(120,120,125)] group-hover:translate-x-1 transition-transform">
-                View Report →
-              </span>
+              <div className="flex items-center space-x-3">
+                <span
+                  role="button"
+                  onClick={(e) => handleDownload(e, vuln)}
+                  className={`text-[rgb(80,80,85)] hover:text-[rgb(180,180,180)] transition-colors ${downloading === vuln.id ? 'animate-pulse' : ''}`}
+                  title="Download .md"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                </span>
+                <span className="text-[9px] text-[rgb(120,120,125)] group-hover:translate-x-1 transition-transform">
+                  View Report →
+                </span>
+              </div>
             </div>
           </button>
         )
@@ -342,30 +384,41 @@ function VulnerabilityDetail({ vulnId, onBack }: { vulnId: string; onBack: () =>
     <div className="h-screen flex flex-col bg-[rgb(5,5,8)]">
       {/* Header */}
       <div className="border-b border-[rgb(40,40,45)] bg-[rgb(10,10,15)] shrink-0">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
           <button
             onClick={onBack}
             className="flex items-center space-x-2 text-[rgb(100,100,105)] hover:text-[rgb(180,180,180)] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-mono">Back to Reports</span>
+            <span className="text-sm font-mono">Back</span>
           </button>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-2 md:gap-0 md:space-x-4">
             <div className={`px-3 py-1 ${config.bg} bg-opacity-10 border ${config.border} rounded-sm`}>
               <span className={`text-[10px] font-bold tracking-widest ${config.color}`}>{severity}</span>
             </div>
             {cvss && (
-              <div className="px-3 py-1 bg-[rgb(20,20,25)] border border-[rgb(40,40,45)] rounded-sm">
+              <div className="px-3 py-1 bg-[rgb(20,20,25)] border border-[rgb(40,40,45)] rounded-sm hidden md:block">
                 <span className="text-[10px] font-mono text-[rgb(140,140,145)]">CVSS: {cvss}</span>
               </div>
             )}
+            <button
+              onClick={() => {
+                const title = sanitizeFilename(report.content.split('\n')[0] || `vulnerability_${report.id}`)
+                downloadMarkdown(report.content, title)
+              }}
+              className="flex items-center space-x-2 px-3 py-1 bg-[rgb(20,20,25)] border border-[rgb(40,40,45)] rounded-sm hover:border-[rgb(80,80,90)] transition-colors"
+              title="Download .md"
+            >
+              <Download className="w-3.5 h-3.5 text-[rgb(140,140,145)]" />
+              <span className="text-[10px] font-mono text-[rgb(140,140,145)] hidden md:inline">Download</span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-6">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6">
         <div className="max-w-4xl mx-auto pb-12">
           {renderMarkdown(report.content)}
         </div>
@@ -386,23 +439,25 @@ export default function ReportsPage() {
     <div className="h-screen flex flex-col bg-[rgb(5,5,8)]">
       {/* Header */}
       <div className="border-b border-[rgb(40,40,45)] bg-[rgb(10,10,15)] shrink-0">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
           <Link
             href="/"
             className="flex items-center space-x-2 text-[rgb(100,100,105)] hover:text-[rgb(180,180,180)] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-mono">Back to Dashboard</span>
+            <span className="text-sm font-mono hidden md:inline">Back to Dashboard</span>
+            <span className="text-sm font-mono md:hidden">Back</span>
           </Link>
 
           <div className="flex items-center space-x-3">
             <Shield className="w-5 h-5 text-[rgb(100,100,105)]" />
-            <h1 className="text-lg font-bold text-[rgb(200,200,200)] uppercase tracking-widest">
-              Vulnerability Reports
+            <h1 className="text-sm md:text-lg font-bold text-[rgb(200,200,200)] uppercase tracking-widest">
+              <span className="hidden md:inline">Vulnerability Reports</span>
+              <span className="md:hidden">Reports</span>
             </h1>
           </div>
 
-          <div className="w-32" /> {/* Spacer for centering */}
+          <div className="hidden md:block w-32" /> {/* Spacer for centering */}
         </div>
       </div>
 
